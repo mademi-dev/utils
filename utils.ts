@@ -432,7 +432,49 @@ const changeFaToEn = (el: any) => {
     });
 };
 
+//its a generator to convert string condition oprators to finding access controll
+// ex:
+//  const access = useAccess( 'ADMIN&EDIT_USERS|SUPER_ADMIN' , [ ADMIN , EDIT_USERS ] ,'&','|');
+// and thats return boolean type
+const useAccess = (  
+  _init: string,
+  _DB: string[],
+  _CUSTOMAND: string = ',',
+  _CUSTOMOR: string = '|' 
+     ) => {
+  let 
+    and:string[] = _init.split(_CUSTOMAND),
+    tempAnsw1:boolean[] = [],
+    tempAnsw2:boolean[] = [];
+
+    for (let i = 0; i < and.length; i++) {
+      const el = and[i];
+      if(el.includes(_CUSTOMOR)){
+        let or=el.split(_CUSTOMOR);
+        for (let j = 0; j < or.length; j++) {
+          const item = or[j];
+          tempAnsw1.push(_DB.includes(item))
+        };
+        if (tempAnsw1.includes(true)) {
+          tempAnsw2.push(true);
+          if(and.length !== 1) continue;
+          else return true
+        }else return false;
+      }else{
+        if(and.length===1) {
+          tempAnsw2.push(_DB.includes(el));
+          return _DB.includes(el);
+        } else { 
+          tempAnsw2.push(_DB.includes(el)); 
+          continue;
+        }
+      }
+    };
+    return !tempAnsw2.includes(false)
+}
+
 export {
+useAccess,
   PERSIAN_MONTHS,
   ENGLISH_MONTHS,
   newGuid,
